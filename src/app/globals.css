@@ -1,0 +1,237 @@
+
+/* === KHUSHI THEME START === */
+
+:root {
+
+  /* ========================================================
+     CORE WORLD
+  ======================================================== */
+
+  --bg-ivory: #F4EFE6;
+
+  --paper: #FBF7F0;
+  --paper-light: #FFF9F2;
+  --paper-muted: #F1EBE1;
+  --paper-deep: #EAE3D8;
+
+
+  /* ========================================================
+     TYPOGRAPHY
+  ======================================================== */
+
+  --ink: #1B1918;
+  --ink-soft: #59524E;
+  --ink-muted: #8A817B;
+  --warm-grey: #AAA199;
+
+
+  /* ========================================================
+     CHARACTER / IDENTITY
+  ======================================================== */
+
+  --maroon: #2B0714;
+  --maroon-deep: #230611;
+
+  --pink: #EC3A7A;
+  --pink-bright: #FF4C8D;
+  --rose: #C98FA5;
+
+  --pink-soft:
+    rgba(
+      236,
+      58,
+      122,
+      0.12
+    );
+
+  --pink-border:
+    rgba(
+      236,
+      58,
+      122,
+      0.24
+    );
+
+
+  /* ========================================================
+     DEPTH
+  ======================================================== */
+
+  --border-soft:
+    rgba(
+      27,
+      25,
+      24,
+      0.13
+    );
+
+  --shadow-soft:
+    0 18px 50px
+    rgba(
+      43,
+      7,
+      20,
+      0.08
+    );
+
+  --shadow-paper:
+    0 30px 80px
+    rgba(
+      27,
+      25,
+      24,
+      0.14
+    );
+
+}
+
+
+/* ==========================================================
+   GLOBAL WORLD
+========================================================== */
+
+html {
+  background:
+    var(--bg-ivory);
+}
+
+
+body {
+  background:
+    var(--bg-ivory);
+
+  color:
+    var(--ink);
+}
+
+
+/* ==========================================================
+   SELECTION
+
+   No more green browser highlight.
+========================================================== */
+
+::selection {
+
+  background:
+    var(--pink);
+
+  color:
+    var(--paper-light);
+
+}
+
+
+::-moz-selection {
+
+  background:
+    var(--pink);
+
+  color:
+    var(--paper-light);
+
+}
+
+
+/* ==========================================================
+   SCROLLBAR
+
+   Keep even browser chrome visually coordinated.
+========================================================== */
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+
+::-webkit-scrollbar-track {
+  background:
+    var(--bg-ivory);
+}
+
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    rgba(
+      43,
+      7,
+      20,
+      0.28
+    );
+
+  border:
+    2px solid
+    var(--bg-ivory);
+
+  border-radius:
+    999px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+  background:
+    rgba(
+      236,
+      58,
+      122,
+      0.62
+    );
+
+}
+
+
+/* === KHUSHI THEME END === */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: auto;
+  background: var(--bg-ivory);
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--bg-ivory);
+  color: var(--ink);
+  font-family: "Helvetica Neue", "Aptos", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--pink);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

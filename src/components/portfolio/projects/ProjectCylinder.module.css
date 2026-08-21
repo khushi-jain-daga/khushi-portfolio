@@ -1,0 +1,326 @@
+.section {
+  position: relative;
+  min-height: 148vh;
+  background: var(--bg-ivory, #f4efe6);
+  color: var(--ink, #1b1918);
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.72), transparent 31%),
+    var(--bg-ivory, #f4efe6);
+  isolation: isolate;
+}
+
+.sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: radial-gradient(rgba(27, 25, 24, 0.22) 0.42px, transparent 0.42px);
+  background-size: 5px 5px;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+}
+
+.cylinderHeader {
+  position: absolute;
+  left: clamp(18px, 3.4vw, 54px);
+  right: clamp(18px, 3.4vw, 54px);
+  top: clamp(18px, 3.4vh, 38px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.cylinderHeader > span,
+.cylinderHeader small,
+.paperTopline,
+.paperFooter,
+.scrollExit {
+  font-size: 7px;
+  font-weight: 760;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.cylinderHeader > span {
+  color: var(--ink, #1b1918);
+}
+
+.cylinderHeader small {
+  color: rgba(27, 25, 24, 0.42);
+}
+
+.cylinderStage {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  perspective: 1800px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+
+.cylinderStage:active {
+  cursor: grabbing;
+}
+
+.centerShadow {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: min(28vw, 360px);
+  height: 48px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(43, 7, 20, 0.075);
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+.paperCard {
+  --depth: 0.5;
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  width: clamp(210px, 14.6vw, 248px);
+  height: clamp(292px, 37vh, 350px);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(27, 25, 24, 0.14);
+  border-radius: 3px;
+  background:
+    linear-gradient(112deg, rgba(255, 255, 255, 0.44), transparent 44%),
+    var(--paper, #fbf7f0);
+  color: var(--ink, #1b1918);
+  text-align: left;
+  box-shadow:
+    0 calc(7px + var(--depth) * 11px)
+    calc(20px + var(--depth) * 24px)
+    rgba(43, 7, 20, 0.105);
+  transform-origin: center;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  cursor: pointer;
+  will-change: transform, opacity, filter;
+  appearance: none;
+  font: inherit;
+}
+
+.paperCard::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 52px;
+  height: 8px;
+  transform: translateX(-50%);
+  background: rgba(236, 58, 122, 0.46);
+  pointer-events: none;
+}
+
+.paperCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: radial-gradient(rgba(27, 25, 24, 0.20) 0.38px, transparent 0.38px);
+  background-size: 4px 4px;
+}
+
+.paperCard:hover,
+.paperCard:focus-visible {
+  border-color: rgba(236, 58, 122, 0.38);
+  outline: none;
+}
+
+.paperTopline,
+.paperFooter {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(27, 25, 24, 0.46);
+}
+
+.paperTopline > span:last-child {
+  max-width: 66%;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paperCard > strong {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin: 13px 0 6px;
+  color: var(--ink, #1b1918);
+  font-size: clamp(20px, 1.55vw, 27px);
+  line-height: 0.98;
+  letter-spacing: -0.047em;
+}
+
+.paperSummary {
+  position: relative;
+  z-index: 2;
+  display: block;
+  min-height: 2.55em;
+  color: rgba(27, 25, 24, 0.58);
+  font-size: clamp(8px, 0.58vw, 10px);
+  line-height: 1.38;
+}
+
+.paperVisual {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 47%;
+  margin: 11px 0 10px;
+  overflow: hidden;
+  border: 1px solid rgba(27, 25, 24, 0.09);
+  border-radius: 2px;
+  background: var(--paper-deep, #eae3d8);
+}
+
+.paperVisual img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 280ms ease;
+  pointer-events: none;
+}
+
+.paperCard:hover .paperVisual img {
+  transform: scale(1.018);
+}
+
+.codeVisual {
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  background:
+    radial-gradient(circle at 74% 20%, rgba(236, 58, 122, 0.12), transparent 35%),
+    var(--maroon, #2b0714);
+  color: var(--paper-light, #fff9f2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.codeVisual i {
+  color: rgba(255, 249, 242, 0.45);
+  font-size: 6px;
+  font-style: normal;
+  letter-spacing: 0.18em;
+}
+
+.codeVisual b {
+  max-width: 94%;
+  color: var(--pink-bright, #ff4c8d);
+  font-size: clamp(14px, 1.24vw, 20px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+.paperFooter {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(27, 25, 24, 0.10);
+}
+
+.paperFooter > span:last-child {
+  color: var(--pink, #ec3a7a);
+}
+
+.scrollExit {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: 3000;
+  transform: translateX(-50%);
+  color: rgba(27, 25, 24, 0.36);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 1050px) {
+  .section {
+    min-height: 142vh;
+  }
+
+  .paperCard {
+    width: clamp(205px, 19vw, 232px);
+    height: clamp(286px, 36vh, 330px);
+  }
+}
+
+@media (max-width: 680px) {
+  .section {
+    min-height: 134vh;
+  }
+
+  .cylinderHeader {
+    left: 15px;
+    right: 15px;
+    top: 16px;
+  }
+
+  .cylinderHeader small {
+    display: none;
+  }
+
+  .paperCard {
+    top: 51%;
+    width: min(54vw, 205px);
+    height: min(42vh, 305px);
+    padding: 13px;
+  }
+
+  .paperCard > strong {
+    font-size: clamp(18px, 6vw, 24px);
+  }
+
+  .paperSummary {
+    font-size: 8px;
+  }
+
+  .paperVisual {
+    height: 45%;
+    margin: 10px 0 9px;
+  }
+
+  .scrollExit {
+    bottom: 16px;
+    font-size: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paperVisual img {
+    transition: none;
+  }
+}

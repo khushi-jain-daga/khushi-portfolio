@@ -1,0 +1,545 @@
+.section {
+  position: relative;
+  height: 350vh;
+  background: var(--bg-ivory);
+}
+
+.sticky {
+  --pointer-x: 0px;
+  --pointer-y: 0px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-ivory);
+  color: var(--ink);
+  perspective: 1100px;
+  isolation: isolate;
+}
+
+.editorialGrid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.20;
+  background-image:
+    linear-gradient(rgba(24, 24, 23, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24, 24, 23, 0.055) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 72%);
+}
+
+.registrationA,
+.registrationB {
+  position: absolute;
+  z-index: 1;
+  color: rgba(25, 25, 24, 0.22);
+  font: 400 18px/1 monospace;
+}
+
+.registrationA { left: 4vw; top: 7vh; }
+.registrationB { right: 4vw; bottom: 7vh; }
+
+.problemCharacter,
+.ideaCharacter {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 6;
+  width: min(64vw, 860px);
+  transform-origin: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.problemCharacter img,
+.ideaCharacter img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 28px 38px rgba(69, 24, 43, 0.08));
+}
+
+.messageCloud,
+.thoughtCloud {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.clientMessage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(292px, 26vw);
+  min-height: 50px;
+  padding: 14px 16px 14px 34px;
+  border: 1px solid rgba(25, 25, 24, 0.17);
+  border-radius: 4px 13px 5px 11px;
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, 0.64), transparent 46%),
+    var(--paper);
+  box-shadow:
+    0 16px 34px rgba(32, 28, 22, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  color: var(--ink);
+  font-size: clamp(11px, 0.86vw, 14px);
+  font-weight: 560;
+  line-height: 1.35;
+  will-change: transform, opacity;
+  overflow: hidden;
+}
+
+.messageDot {
+  position: absolute;
+  left: 14px;
+  top: 17px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 0 4px rgba(236, 58, 122, 0.18);
+}
+
+.messageText {
+  position: relative;
+  z-index: 2;
+}
+
+.messageFragmentMark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--pink);
+  font-size: clamp(26px, 3vw, 46px);
+  font-weight: 850;
+  background: var(--paper);
+}
+
+.pressureHalo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+  width: min(42vw, 580px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(236, 58, 122, 0.16);
+  box-shadow:
+    0 0 0 18px rgba(236, 58, 122, 0.025),
+    0 0 90px rgba(236, 58, 122, 0.08);
+  pointer-events: none;
+}
+
+.thoughtCloud {
+  z-index: 17;
+  transition: transform 0.24s ease-out;
+}
+
+.thoughtFragment {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  min-width: 48px;
+  min-height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  will-change: transform, opacity;
+}
+
+.fragment_mark {
+  color: var(--pink);
+  font-size: clamp(28px, 4vw, 66px);
+}
+
+.fragment_node {
+  padding: 9px 13px;
+  border: 1px solid rgba(25, 25, 24, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.88);
+}
+
+.fragment_box,
+.fragment_window {
+  width: 76px;
+  height: 58px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.fragment_window {
+  width: 98px;
+  height: 66px;
+  border-width: 1px;
+  box-shadow: inset 0 12px 0 rgba(236, 58, 122, 0.28);
+}
+
+.fragment_code {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bg-ivory);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.connectionSketch {
+  position: absolute;
+  inset: 12% 12%;
+  width: 76%;
+  height: 76%;
+  overflow: visible;
+}
+
+.connectionSketch path {
+  fill: none;
+  stroke: rgba(236, 58, 122, 0.68);
+  stroke-width: 0.48;
+  stroke-linecap: round;
+  stroke-dasharray: 130;
+  transition: stroke-dashoffset 0.06s linear;
+}
+
+.solutionClick {
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  z-index: 28;
+  width: 130px;
+  height: 130px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.solutionClick > span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(236, 58, 122, 0.38);
+  box-shadow: 0 0 36px rgba(236, 58, 122, 0.15);
+}
+
+.solutionClick small {
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: 0.11em;
+}
+
+.microCopy {
+  position: absolute;
+  left: 50%;
+  top: 15vh;
+  z-index: 30;
+  transform: translateX(-50%);
+  color: rgba(25, 25, 24, 0.60);
+  font-size: clamp(10px, 0.78vw, 13px);
+  font-weight: 620;
+  letter-spacing: 0.09em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.microCopySecond {
+  color: var(--ink);
+}
+
+.morphWorld {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  z-index: 40;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.morphCard {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(330px, 27vw);
+  height: min(250px, 31vh);
+  overflow: hidden;
+  border: 1px solid rgba(25, 25, 24, 0.16);
+  border-radius: 5px 12px 6px 9px;
+  background: var(--paper);
+  box-shadow: 0 24px 56px rgba(28, 24, 19, 0.13);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.morphCardHero {
+  width: min(610px, 47vw);
+  height: min(390px, 46vh);
+}
+
+.morphMessage,
+.morphProduct {
+  position: absolute;
+  inset: 0;
+}
+
+.morphMessage {
+  display: flex;
+  align-items: center;
+  padding: 22px 25px 22px 52px;
+  color: var(--ink);
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.morphMessage > span {
+  position: absolute;
+  left: 24px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pink);
+}
+
+.morphProduct {
+  background: var(--paper-muted);
+}
+
+.morphProductTop {
+  height: 36px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-bottom: 1px solid rgba(25, 25, 24, 0.10);
+  background: var(--paper);
+}
+
+.morphProductTop i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: 0.28;
+}
+
+.morphProductTop small {
+  margin-left: auto;
+  color: rgba(25, 25, 24, 0.50);
+  font-size: 6px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.morphProduct img {
+  width: 100%;
+  height: calc(100% - 36px);
+  display: block;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.morphCode {
+  height: calc(100% - 36px);
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--pink);
+  font: 750 clamp(14px, 1.5vw, 22px)/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.pullbackHint {
+  position: absolute;
+  left: 50%;
+  bottom: 5vh;
+  z-index: 70;
+  color: rgba(25, 25, 24, 0.47);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .section { height: 330vh; }
+  .problemCharacter,
+  .ideaCharacter { width: min(86vw, 760px); }
+  .clientMessage { width: min(240px, 35vw); }
+  .morphCard { width: min(270px, 35vw); }
+  .morphCardHero { width: min(520px, 58vw); height: 39vh; }
+}
+
+@media (max-width: 560px) {
+  .section { height: 310vh; }
+  .editorialGrid { background-size: 44px 44px; }
+  .problemCharacter,
+  .ideaCharacter { width: 108vw; top: 52%; }
+  .clientMessage {
+    width: min(184px, 47vw);
+    min-height: 42px;
+    padding: 10px 11px 10px 28px;
+    font-size: 9px;
+  }
+  .messageDot { left: 10px; top: 13px; width: 6px; height: 6px; }
+  .thoughtFragment { font-size: 10px; }
+  .fragment_mark { font-size: 34px; }
+  .microCopy { top: 12vh; font-size: 9px; }
+  .morphCard { width: 165px; height: 150px; }
+  .morphCardHero { width: 255px; height: 245px; }
+  .morphProductTop small { display: none; }
+  .pullbackHint { bottom: 3vh; font-size: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thoughtCloud { transition: none; }
+  .connectionSketch path { transition: none; }
+}
+
+
+/* ==========================================================
+   KHUSHI COLOR COORDINATION
+   STORY / PROBLEM → PRODUCT WORLD
+========================================================== */
+
+.section,
+.sticky {
+  background:
+    var(--bg-ivory);
+
+  color:
+    var(--ink);
+}
+
+
+/*
+  Client problem papers.
+*/
+
+.message {
+  background:
+    rgba(
+      251,
+      247,
+      240,
+      0.96
+    );
+
+  color:
+    var(--ink);
+
+  border-color:
+    var(--border-soft);
+
+  box-shadow:
+    var(--shadow-soft);
+}
+
+
+/*
+  Any status dot / highlight from the old green system
+  becomes portfolio pink.
+*/
+
+.messageDot,
+.dot,
+.statusDot,
+.nodeDot {
+  background:
+    var(--pink) !important;
+
+  box-shadow:
+    0
+    0
+    0
+    4px
+    var(--pink-soft) !important;
+}
+
+
+/*
+  Thought / connection lines.
+*/
+
+.section svg path,
+.section svg line {
+  stroke: rgba(236, 58, 122, 0.60);
+}
+
+
+/*
+  UI fragments remain neutral.
+*/
+
+.fragment,
+.thoughtFragment,
+.uiFragment {
+  border-color:
+    var(--border-soft);
+
+  background:
+    rgba(
+      251,
+      247,
+      240,
+      0.90
+    );
+
+  color:
+    var(--ink);
+}
+
+
+/*
+  Dark miniature components use graphite,
+  never green-black.
+*/
+
+.codeFragment,
+.darkFragment {
+  background:
+    var(--ink);
+
+  color:
+    var(--paper-light);
+}
+
+
+/*
+  Accent labels.
+*/
+
+.accent,
+.highlight {
+  color:
+    var(--pink);
+}
+
+
+/*
+  Browser / product shells.
+*/
+
+.browser,
+.productFrame,
+.interfaceFrame {
+  background:
+    var(--paper);
+
+  border-color:
+    var(--border-soft);
+
+  box-shadow:
+    var(--shadow-paper);
+}
+
+

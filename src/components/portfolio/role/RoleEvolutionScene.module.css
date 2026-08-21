@@ -1,0 +1,534 @@
+.section {
+  position: relative;
+
+  /*
+    This scroll distance now means CAMERA TRAVEL,
+    not physical page travel.
+  */
+
+  height: 275vh;
+
+  background: var(--pink);
+}
+
+
+.sticky {
+  position: sticky;
+
+  top: 0;
+
+  width: 100%;
+
+  height: 100vh;
+
+  overflow: hidden;
+
+  background: var(--pink);
+
+  isolation: isolate;
+
+  perspective: 1200px;
+
+  perspective-origin:
+    50% 50%;
+}
+
+
+/* ============================================================
+   CHARACTER
+============================================================ */
+
+.character {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: contain;
+
+  pointer-events: none;
+
+  user-select: none;
+
+  will-change: transform;
+}
+
+
+/* ============================================================
+   MOUTH
+============================================================ */
+
+.mouthPortal {
+  position: absolute;
+
+  left: 50%;
+
+  top: 61%;
+
+  z-index: 4;
+
+  width: 96px;
+
+  height: 96px;
+
+  border-radius: 50%;
+
+  background: var(--maroon-deep);
+
+  box-shadow:
+    inset
+    0
+    0
+    24px
+    rgba(
+      0,
+      0,
+      0,
+      0.55
+    );
+
+  transform-origin: center;
+
+  pointer-events: none;
+
+  will-change:
+    transform,
+    opacity;
+}
+
+
+/* ============================================================
+   INSIDE MOUTH
+============================================================ */
+
+.roleWorld {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 8;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse
+      at 50% 52%,
+      rgba(
+        106,
+        20,
+        52,
+        0.36
+      ),
+      transparent 55%
+    ),
+    var(--maroon);
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   CAMERA DEPTH
+============================================================ */
+
+.roleDepth {
+  position: absolute;
+
+  left: 50%;
+
+  top: 50%;
+
+  z-index: 1;
+
+  width: 80vmin;
+
+  height: 80vmin;
+
+  border-radius: 50%;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  background:
+    radial-gradient(
+      circle,
+      transparent 0 30%,
+      rgba(
+        255,
+        76,
+        141,
+        0.05
+      ) 31% 32%,
+      transparent 33% 44%,
+      rgba(
+        255,
+        255,
+        255,
+        0.022
+      ) 45% 46%,
+      transparent 47% 58%,
+      rgba(
+        255,
+        76,
+        141,
+        0.035
+      ) 59% 60%,
+      transparent 61%
+    );
+
+  will-change:
+    transform,
+    opacity;
+}
+
+
+/* ============================================================
+   EDITOR
+============================================================ */
+
+.roleEditor {
+  position: absolute;
+
+  left: 50%;
+
+  top: 50%;
+
+  z-index: 12;
+
+  display: grid;
+
+  width: max-content;
+
+  max-width: 96vw;
+
+  transform-origin: center;
+
+  white-space: nowrap;
+
+  will-change:
+    transform,
+    opacity,
+    filter;
+}
+
+
+.roleSizer,
+.roleLine {
+  grid-area: 1 / 1;
+
+  font-size:
+    clamp(
+      28px,
+      3.85vw,
+      68px
+    );
+
+  line-height: 1;
+
+  white-space: pre;
+
+  letter-spacing:
+    -0.038em;
+}
+
+
+.roleSizer {
+  visibility: hidden;
+
+  pointer-events: none;
+}
+
+
+.roleLine {
+  display: flex;
+
+  align-items: baseline;
+
+  justify-content: flex-start;
+}
+
+
+.roleLine > span {
+  color:
+    rgba(
+      255,
+      250,
+      244,
+      0.96
+    );
+
+  font: inherit;
+
+  font-weight: 430;
+
+  white-space: pre;
+}
+
+
+.roleLine > strong {
+  margin: 0;
+
+  color: var(--pink-bright);
+
+  font: inherit;
+
+  font-weight: 820;
+
+  letter-spacing:
+    -0.048em;
+}
+
+
+.cursor {
+  display: inline-block;
+
+  margin-left: 0.04em;
+
+  color: var(--paper-light);
+
+  font: inherit;
+
+  font-style: normal;
+
+  font-weight: 280;
+
+  animation:
+    cursorBlink
+    0.72s
+    steps(1)
+    infinite;
+}
+
+
+@keyframes cursorBlink {
+
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  49%,
+  100% {
+    opacity: 0;
+  }
+
+}
+
+
+/* ============================================================
+   SCROLL PROMPT
+
+   VERY BOTTOM OF VIEWPORT
+============================================================ */
+
+.scrollPrompt {
+  position: absolute;
+
+  left: 50%;
+
+  bottom:
+    max(
+      24px,
+      env(
+        safe-area-inset-bottom
+      )
+    );
+
+  z-index: 20;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color:
+    rgba(
+      255,
+      250,
+      244,
+      0.72
+    );
+
+  pointer-events: none;
+
+  will-change:
+    opacity,
+    transform;
+}
+
+
+.scrollPrompt span {
+  font-size: 10px;
+
+  font-weight: 520;
+
+  letter-spacing: 0.11em;
+
+  text-transform: lowercase;
+}
+
+
+.scrollPrompt b {
+  color: var(--pink-bright);
+
+  font-size: 17px;
+
+  line-height: 1;
+
+  font-weight: 500;
+
+  animation:
+    promptArrow
+    1.1s
+    ease-in-out
+    infinite;
+}
+
+
+@keyframes promptArrow {
+
+  0%,
+  100% {
+    transform:
+      translateY(0);
+
+    opacity: 0.5;
+  }
+
+  50% {
+    transform:
+      translateY(7px);
+
+    opacity: 1;
+  }
+
+}
+
+
+/* ============================================================
+   NEXT WORLD
+
+   This is a depth reveal.
+   NOT a vertical slide.
+============================================================ */
+
+.nextSceneCurtain {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 40;
+
+  background:
+    var(--bg-ivory);
+
+  transform-origin:
+    center;
+
+  pointer-events: none;
+
+  will-change:
+    transform,
+    opacity;
+}
+
+
+.nextSceneCurtain::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  opacity: 0.18;
+
+  background-image:
+    linear-gradient(
+      rgba(
+        22,
+        22,
+        21,
+        0.04
+      ) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(
+        22,
+        22,
+        21,
+        0.04
+      ) 1px,
+      transparent 1px
+    );
+
+  background-size:
+    72px
+    72px;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (
+  max-width: 700px
+) {
+
+  .section {
+    height: 250vh;
+  }
+
+
+  .roleSizer,
+  .roleLine {
+    font-size:
+      clamp(
+        15px,
+        4.2vw,
+        26px
+      );
+  }
+
+
+  .scrollPrompt {
+    bottom: 22px;
+  }
+
+
+  .scrollPrompt span {
+    font-size: 8px;
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+
+  .cursor,
+  .scrollPrompt b {
+    animation: none;
+  }
+
+}
+
