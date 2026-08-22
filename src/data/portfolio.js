@@ -142,6 +142,7 @@ export const products = [
       "/products/teamspace-03.png",
       "/products/teamspace-04.png",
     ],
+    live: "https://teamspace-v7.vercel.app/",
     github: "https://github.com/khushi-jain-daga",
   },
   {
@@ -223,4 +224,3 @@ export const products = [
     visualCode: "SCORE → SIGNAL → RANK",
   },
 ];
-

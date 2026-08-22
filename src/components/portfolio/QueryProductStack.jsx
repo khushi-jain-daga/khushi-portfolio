@@ -25,6 +25,7 @@ export default function QueryProductStack({products}){
   const [phase,setPhase]=useState("idle");
   const [activeProject,setActiveProject]=useState(0);
   const [dragX,setDragX]=useState(0);
+  const [deckPaused,setDeckPaused]=useState(false);
   const storyStarted=useRef(false);
   const dragStart=useRef(null);
   const didDrag=useRef(false);
@@ -66,16 +67,16 @@ export default function QueryProductStack({products}){
 
   const fullProducts=phase==="products"||phase==="moving";
   const isReady=phase==="clarity"||phase==="preview"||fullProducts;
-  const pauseAutoDeck=()=>{autoPauseUntil.current=Date.now()+7000;};
+  const pauseAutoDeck=()=>{autoPauseUntil.current=Date.now()+4500;};
 
   useEffect(()=>{
     if(phase!=="moving"||featured.length<2)return;
     const timer=window.setInterval(()=>{
-      if(Date.now()<autoPauseUntil.current||dragStart.current!==null)return;
+      if(deckPaused||Date.now()<autoPauseUntil.current||dragStart.current!==null)return;
       setActiveProject(index=>(index+1)%featured.length);
-    },3200);
+    },4000);
     return()=>window.clearInterval(timer);
-  },[phase,featured.length]);
+  },[phase,featured.length,deckPaused]);
 
   const finishDrag=()=>{
     if(dragStart.current===null)return;
@@ -123,7 +124,7 @@ export default function QueryProductStack({products}){
 
       <div className={`${styles.projectWall} ${fullProducts?styles.showProjectWall:""} ${phase==="moving"?styles.moveProjectWall:""}`}>
         <header><span>THE MESS BECOMES A PRODUCT / 02</span><h2>Problems become<em> working products.</em></h2></header>
-        <div className={styles.projectGrid} onPointerDown={event=>{dragStart.current=event.clientX;didDrag.current=false;event.currentTarget.setPointerCapture(event.pointerId);}} onPointerMove={event=>{if(dragStart.current!==null){const distance=event.clientX-dragStart.current;if(Math.abs(distance)>8)didDrag.current=true;setDragX(distance);}}} onPointerUp={finishDrag} onPointerCancel={finishDrag}>
+        <div className={styles.projectGrid} onMouseEnter={()=>setDeckPaused(true)} onMouseLeave={()=>setDeckPaused(false)} onPointerDown={event=>{dragStart.current=event.clientX;didDrag.current=false;event.currentTarget.setPointerCapture(event.pointerId);}} onPointerMove={event=>{if(dragStart.current!==null){const distance=event.clientX-dragStart.current;if(Math.abs(distance)>8)didDrag.current=true;setDragX(distance);}}} onPointerUp={finishDrag} onPointerCancel={finishDrag}>
           {featured.map((product,index)=>{
           const cover=product.gallery?.[0];
           let offset=index-activeProject;
@@ -131,13 +132,24 @@ export default function QueryProductStack({products}){
           if(offset>half)offset-=featured.length;
           if(offset<-half)offset+=featured.length;
           const depth=Math.abs(offset);
-          return <Link href={`/projects/${product.id}`} key={product.id} onClick={event=>{if(didDrag.current||index!==activeProject){event.preventDefault();if(!didDrag.current){pauseAutoDeck();setActiveProject(index);}didDrag.current=false;}}} className={`${styles.wallCard} ${index===activeProject?styles.wallCardActive:""}`} style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*27}vw + ${dragX}px)) translateZ(${-depth*170}px) rotateY(${offset===0?0:offset>0?-26:26}deg) scale(${1-depth*.09})`}}>
-            <div className={styles.wallImage}>{cover?<Image src={cover} alt={`${product.title} project preview`} fill sizes="(max-width: 820px) 44vw, 24vw"/>:<div>{product.visualCode}</div>}</div>
-            <div className={styles.wallCopy}><span>0{index+1} · REAL PRODUCT</span><h3>{product.title}</h3><p>{queryById[product.id]}</p><b>VIEW CASE STUDY ↗</b></div>
-          </Link>;
+          const isActive=index===activeProject;
+          return <article key={product.id} onClick={()=>{if(!didDrag.current&&!isActive){pauseAutoDeck();setActiveProject(index);}didDrag.current=false;}} className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`} style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw + ${dragX}px)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}} aria-hidden={!isActive}>
+            <div className={styles.wallImage}>
+              <div className={styles.browserBar}><i/><i/><i/><span>{product.live?new URL(product.live).hostname:"khushi.build / product"}</span></div>
+              <div className={styles.screen}>{cover?<Image src={cover} alt={`${product.title} product interface`} fill sizes="(max-width: 820px) 78vw, 620px"/>:<div>{product.visualCode}</div>}</div>
+            </div>
+            <div className={styles.wallCopy}>
+              <div className={styles.productMeta}><span>0{index+1} / {product.category}</span><i>{product.role}</i></div>
+              <h3>{product.title}</h3><p>{queryById[product.id]}</p>
+              <div className={styles.cardActions}>
+                <Link href={`/projects/${product.id}`} tabIndex={isActive?0:-1}>READ CASE STUDY <span>↗</span></Link>
+                {product.live&&<a href={product.live} target="_blank" rel="noreferrer" tabIndex={isActive?0:-1}>LIVE PRODUCT <span>↗</span></a>}
+              </div>
+            </div>
+          </article>;
         })}
         </div>
-        <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
+        <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><span className={`${styles.autoProgress} ${deckPaused?styles.autoProgressPaused:""}`} key={activeProject}/><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
       </div>
 
       <p className={styles.scrollHint}>{fullProducts?"SELECT A PRODUCT TO READ THE FULL STORY ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
