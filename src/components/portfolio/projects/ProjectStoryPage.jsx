@@ -13,9 +13,10 @@ const details = {
 
 export default function ProjectStoryPage({ product, nextProduct }) {
   const info = details[product.id] || { stack:["Product thinking","Design","Development"], impact:["Useful workflow","Clear experience","Shipped product"], decisions:["Find the friction","Structure the journey","Build the useful version"] };
+  const backToWork=`/?project=${encodeURIComponent(product.id)}#work`;
   return (
     <main className={styles.page}>
-      <header className={styles.nav}><Link href="/#work">← ALL WORK</Link><span>{product.index} / {product.category}</span><a href="mailto:kjain282004@gmail.com">LET’S TALK ↗</a></header>
+      <header className={styles.nav}><Link href={backToWork}>← ALL WORK</Link><span>{product.index} / {product.category}</span><a href="mailto:kjain282004@gmail.com">LET’S TALK ↗</a></header>
 
       <section className={styles.hero}>
         <div className={styles.heroNumber}>{product.index}</div>
@@ -43,7 +44,7 @@ export default function ProjectStoryPage({ product, nextProduct }) {
 
       <section className={styles.takeaway}><span>05 / TAKEAWAY</span><blockquote>“The best product work makes a complicated system feel quietly obvious.”</blockquote><p>This project reflects how I work: understand the real friction, organise the system, and carry the idea through to something people can use.</p><div className={styles.links}>{product.live&&<a href={product.live} target="_blank" rel="noreferrer">OPEN PRODUCT ↗</a>}{product.github&&<a href={product.github} target="_blank" rel="noreferrer">VIEW GITHUB ↗</a>}</div></section>
 
-      <footer className={styles.footer}><Link href="/#work">← BACK TO WORK</Link>{nextProduct&&<Link href={`/projects/${nextProduct.id}`} className={styles.next}><span>NEXT CASE FILE</span><strong>{nextProduct.title}</strong><i>→</i></Link>}</footer>
+      <footer className={styles.footer}><Link href={backToWork}>← BACK TO WORK</Link>{nextProduct&&<Link href={`/projects/${nextProduct.id}`} className={styles.next}><span>NEXT CASE FILE</span><strong>{nextProduct.title}</strong><i>→</i></Link>}</footer>
     </main>
   );
 }

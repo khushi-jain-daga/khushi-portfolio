@@ -24,13 +24,30 @@ export default function QueryProductStack({products}){
   const [progress,setProgress]=useState(0);
   const [phase,setPhase]=useState("idle");
   const [activeProject,setActiveProject]=useState(0);
-  const [dragX,setDragX]=useState(0);
-  const [deckPaused,setDeckPaused]=useState(false);
   const storyStarted=useRef(false);
-  const dragStart=useRef(null);
-  const didDrag=useRef(false);
+  const deckHovered=useRef(false);
   const autoPauseUntil=useRef(0);
+  const restoringWork=useRef(false);
   const featured=useMemo(()=>featuredIds.map(id=>products.find(p=>p.id===id)).filter(Boolean),[products]);
+
+  useEffect(()=>{
+    const params=new URLSearchParams(window.location.search);
+    const returnedProject=params.get("project");
+    if(window.location.hash!=="#work"&&!returnedProject)return;
+
+    restoringWork.current=true;
+    storyStarted.current=true;
+    setPhase("moving");
+    const returnedIndex=featured.findIndex(product=>product.id===returnedProject);
+    if(returnedIndex>=0)setActiveProject(returnedIndex);
+
+    const restore=window.requestAnimationFrame(()=>{
+      ref.current?.scrollIntoView({block:"start"});
+      window.history.replaceState(null,"","/#work");
+    });
+    const release=window.setTimeout(()=>{restoringWork.current=false;},700);
+    return()=>{window.cancelAnimationFrame(restore);window.clearTimeout(release);};
+  },[featured]);
 
   useEffect(()=>{
     const update=()=>{
@@ -47,6 +64,7 @@ export default function QueryProductStack({products}){
   },[]);
 
   useEffect(()=>{
+    if(restoringWork.current)return;
     if(progress<.1){storyStarted.current=false;setPhase("idle");return;}
     if(storyStarted.current)return;
     storyStarted.current=true;
@@ -67,25 +85,16 @@ export default function QueryProductStack({products}){
 
   const fullProducts=phase==="products"||phase==="moving";
   const isReady=phase==="clarity"||phase==="preview"||fullProducts;
-  const pauseAutoDeck=()=>{autoPauseUntil.current=Date.now()+4500;};
+  const pauseAutoDeck=()=>{autoPauseUntil.current=Date.now()+4000;};
 
   useEffect(()=>{
-    if(phase!=="moving"||featured.length<2)return;
+    if(!fullProducts||featured.length<2)return;
     const timer=window.setInterval(()=>{
-      if(deckPaused||Date.now()<autoPauseUntil.current||dragStart.current!==null)return;
+      if(deckHovered.current||Date.now()<autoPauseUntil.current)return;
       setActiveProject(index=>(index+1)%featured.length);
-    },4000);
+    },3500);
     return()=>window.clearInterval(timer);
-  },[phase,featured.length,deckPaused]);
-
-  const finishDrag=()=>{
-    if(dragStart.current===null)return;
-    if(Math.abs(dragX)>8)pauseAutoDeck();
-    if(dragX<-55)setActiveProject(index=>(index+1)%featured.length);
-    if(dragX>55)setActiveProject(index=>(index-1+featured.length)%featured.length);
-    dragStart.current=null;
-    setDragX(0);
-  };
+  },[fullProducts,featured.length]);
 
   return <section id="work" ref={ref} className={styles.section}>
     <div className={`${styles.sticky} ${styles[`phase_${phase}`]}`}>
@@ -124,32 +133,40 @@ export default function QueryProductStack({products}){
 
       <div className={`${styles.projectWall} ${fullProducts?styles.showProjectWall:""} ${phase==="moving"?styles.moveProjectWall:""}`}>
         <header><span>THE MESS BECOMES A PRODUCT / 02</span><h2>Problems become<em> working products.</em></h2></header>
-        <div className={styles.projectGrid} onMouseEnter={()=>setDeckPaused(true)} onMouseLeave={()=>setDeckPaused(false)} onPointerDown={event=>{dragStart.current=event.clientX;didDrag.current=false;event.currentTarget.setPointerCapture(event.pointerId);}} onPointerMove={event=>{if(dragStart.current!==null){const distance=event.clientX-dragStart.current;if(Math.abs(distance)>8)didDrag.current=true;setDragX(distance);}}} onPointerUp={finishDrag} onPointerCancel={finishDrag}>
+        <div className={styles.projectGrid} onPointerEnter={()=>{deckHovered.current=true;}} onPointerLeave={()=>{deckHovered.current=false;}}>
           {featured.map((product,index)=>{
-          const cover=product.gallery?.[0];
+          const gallery=product.id==="qampus"?[product.gallery?.[3],product.gallery?.[1],product.gallery?.[2]].filter(Boolean):(product.gallery||[]).slice(0,3);
           let offset=index-activeProject;
           const half=featured.length/2;
           if(offset>half)offset-=featured.length;
           if(offset<-half)offset+=featured.length;
           const depth=Math.abs(offset);
           const isActive=index===activeProject;
-          return <article key={product.id} onClick={()=>{if(!didDrag.current&&!isActive){pauseAutoDeck();setActiveProject(index);}didDrag.current=false;}} className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`} style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw + ${dragX}px)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}} aria-hidden={!isActive}>
+          return <article key={product.id} className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`} style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}}>
             <div className={styles.wallImage}>
-              <div className={styles.browserBar}><i/><i/><i/><span>{product.live?new URL(product.live).hostname:"khushi.build / product"}</span></div>
-              <div className={styles.screen}>{cover?<Image src={cover} alt={`${product.title} product interface`} fill sizes="(max-width: 820px) 78vw, 620px"/>:<div>{product.visualCode}</div>}</div>
+              <div className={`${styles.productCover} ${styles[`cover_${product.id.replaceAll("-","_")}`]}`}>
+                <span className={styles.coverLabel}>{product.category}</span>
+                {gallery.length?<div className={styles.deviceComposition}>
+                  {gallery.map((image,index)=><figure key={image} className={styles[`device${index+1}`]}><div className={styles.browserBar}><i/><i/><i/></div><div className={styles.screen}><Image src={image} alt={`${product.title} interface view ${index+1}`} fill sizes="(max-width: 820px) 72vw, 520px"/></div></figure>)}
+                </div>:<div className={styles.generatedCover}>{product.visualCode}</div>}
+                <strong>{product.title}</strong>
+              </div>
             </div>
             <div className={styles.wallCopy}>
               <div className={styles.productMeta}><span>0{index+1} / {product.category}</span><i>{product.role}</i></div>
               <h3>{product.title}</h3><p>{queryById[product.id]}</p>
               <div className={styles.cardActions}>
-                <Link href={`/projects/${product.id}`} tabIndex={isActive?0:-1}>READ CASE STUDY <span>↗</span></Link>
-                {product.live&&<a href={product.live} target="_blank" rel="noreferrer" tabIndex={isActive?0:-1}>LIVE PRODUCT <span>↗</span></a>}
+                <Link href={`/projects/${product.id}`} onClick={event=>event.stopPropagation()}>READ CASE STUDY <span>↗</span></Link>
+                {product.live&&<a href={product.live} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>LIVE PRODUCT <span>↗</span></a>}
               </div>
             </div>
+            {isActive&&<Link className={styles.cardOpenLink} href={`/projects/${product.id}`} aria-label={`Open ${product.title} case study`}/>} 
           </article>;
         })}
+        <button type="button" className={`${styles.sidePicker} ${styles.sidePickerLeft}`} aria-label="Bring previous project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}/>
+        <button type="button" className={`${styles.sidePicker} ${styles.sidePickerRight}`} aria-label="Bring next project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}/>
         </div>
-        <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><span className={`${styles.autoProgress} ${deckPaused?styles.autoProgressPaused:""}`} key={activeProject}/><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
+        <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
       </div>
 
       <p className={styles.scrollHint}>{fullProducts?"SELECT A PRODUCT TO READ THE FULL STORY ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
