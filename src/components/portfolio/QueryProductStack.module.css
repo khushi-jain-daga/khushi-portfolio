@@ -116,6 +116,13 @@
 .cardActions a:hover{background:#201d1c;color:#f5ead8;transform:translateY(-2px)}
 .cardActions a+ a{background:#e83d78;border-color:#e83d78;color:#fff}
 .cardActions a+ a:hover{background:#c82e65;border-color:#c82e65}
+.cardOpenLink{position:absolute;inset:0;z-index:20;display:block}
+.cardActions{position:relative;z-index:30}
+.projectGrid>.wallCard:not(.wallCardActive){pointer-events:none}
+.sidePicker{position:absolute;top:10px;bottom:76px;width:calc(50% - min(310px,19.5vw));z-index:12;border:0;padding:0;background:transparent;cursor:pointer}
+.sidePickerLeft{left:0}
+.sidePickerRight{right:0}
+.sidePicker:focus-visible{outline:2px solid #e83d78;outline-offset:-4px}
 .projectControls{bottom:.65vh;gap:12px}
 .projectControls>button{width:36px;height:36px;transition:background .25s,color .25s,transform .25s}.projectControls>button:hover{background:#e83d78;color:#fff;transform:scale(1.06)}
 .projectControls>div{gap:6px}.projectControls>div .activeDot{width:20px}
@@ -132,3 +139,44 @@
 }
 
 @media(prefers-reduced-motion:reduce){.projectGrid>.wallCard{transition-duration:.01ms}.autoProgress{animation:none}.wallCardActive .screen img{transform:none}}
+
+/* V18: art-directed project covers instead of raw screenshot crops. */
+.wallImage{display:block;position:relative;background:#171514;border-bottom:1px solid #cfc1b2}
+.productCover{position:absolute;inset:0;overflow:hidden;padding:18px 20px;background:linear-gradient(135deg,#171a20,#273244);isolation:isolate}
+.productCover:before{content:"";position:absolute;inset:-35%;z-index:-1;background:radial-gradient(circle,#ffffff22 0,transparent 56%);transform:translate(18%,-12%)}
+.coverLabel{position:absolute;left:20px;top:16px;z-index:8;font:700 6px/1 Arial,sans-serif;letter-spacing:.18em;color:#fff;text-transform:uppercase;opacity:.75}
+.productCover>strong{position:absolute;right:19px;bottom:14px;z-index:8;font:italic 18px/1 Georgia,serif;color:#fff;font-weight:400;text-shadow:0 2px 12px #000}
+.deviceComposition{position:absolute;inset:42px 18px 22px;perspective:900px}
+.deviceComposition figure{position:absolute;margin:0;overflow:hidden;background:#f6f2eb;border:1px solid #ffffff88;border-radius:6px;box-shadow:0 22px 45px #0008;transition:transform .8s cubic-bezier(.2,.75,.18,1)}
+.deviceComposition .device1{left:12%;right:12%;top:2%;bottom:1%;z-index:3;transform:translateZ(40px)}
+.deviceComposition .device2{left:-2%;width:42%;top:18%;bottom:8%;z-index:2;transform:rotateY(10deg) rotate(-3deg)}
+.deviceComposition .device3{right:-2%;width:42%;top:20%;bottom:6%;z-index:2;transform:rotateY(-10deg) rotate(3deg)}
+.deviceComposition .browserBar{height:17px;padding:0 7px;gap:4px}.deviceComposition .browserBar i{width:4px;height:4px}
+.deviceComposition .screen{position:absolute;inset:17px 0 0;background:#e6dfd5}
+.deviceComposition .screen img{object-fit:cover;object-position:top center;transform:none!important}
+.wallCardActive .device1{transform:translateZ(55px) translateY(-3px)}
+.wallCardActive .device2{transform:rotateY(8deg) rotate(-2deg) translateX(-4px)}
+.wallCardActive .device3{transform:rotateY(-8deg) rotate(2deg) translateX(4px)}
+.cover_examon{background:linear-gradient(135deg,#071c35,#0875b4)}
+.cover_teamspace{background:linear-gradient(135deg,#17162c,#6355e7)}
+.cover_dpp_converter{background:linear-gradient(135deg,#061b39,#0c4d91)}
+.cover_qampus{background:linear-gradient(135deg,#080808,#32270b)}
+.cover_qampus:before{background:radial-gradient(circle,#d6ad322d 0,transparent 56%)}
+.cover_qampus .deviceComposition{inset:35px 18px 14px}
+.cover_qampus .deviceComposition figure{border-radius:15px;background:#050505;border-color:#d8b33e66}
+.cover_qampus .deviceComposition .browserBar{display:none}
+.cover_qampus .deviceComposition .screen{inset:0;background:#050505}
+.cover_qampus .deviceComposition .screen img{object-fit:contain;object-position:center}
+.cover_qampus .deviceComposition .device1{left:34%;right:34%;top:0;bottom:-18%;z-index:4;transform:translateZ(60px)}
+.cover_qampus .deviceComposition .device2{left:7%;width:31%;top:13%;bottom:-12%;transform:rotateY(12deg) rotate(-4deg)}
+.cover_qampus .deviceComposition .device3{right:7%;width:31%;top:13%;bottom:-12%;transform:rotateY(-12deg) rotate(4deg)}
+.cover_qampus>strong{color:#f2cf53}
+.generatedCover{height:100%;display:grid;place-items:center;color:#fff;font:clamp(25px,3vw,45px)/1 Georgia,serif;text-align:center}
+.autoProgress{animation-duration:3.5s}
+
+@media(max-width:820px){
+  .productCover{padding:14px}.coverLabel{left:14px;top:12px}.deviceComposition{inset:34px 10px 17px}
+  .deviceComposition .device1{left:7%;right:7%}.deviceComposition .device2{left:-7%;width:38%}.deviceComposition .device3{right:-7%;width:38%}
+  .productCover>strong{font-size:14px;right:13px;bottom:10px}
+  .cover_qampus .deviceComposition .device1{left:29%;right:29%}.cover_qampus .deviceComposition .device2{left:1%;width:34%}.cover_qampus .deviceComposition .device3{right:1%;width:34%}
+}
