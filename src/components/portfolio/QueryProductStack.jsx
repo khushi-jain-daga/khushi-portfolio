@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./QueryProductStack.module.css";
 
-const featuredIds=["examon","teamspace","dpp-converter","qampus"];
+const featuredIds=["examon","teamspace","batch-manager","academic-planner","dpp-converter","qampus"];
 const problems=[
   {from:"STUDENT · 09:14",quote:"I keep missing important courses, tests and updates.",need:"Everything in one reliable place."},
   {from:"TEAM · 11:42",quote:"Our conversations, tasks and files are scattered everywhere.",need:"One shared space that remembers."},
@@ -14,6 +14,8 @@ const problems=[
 const queryById={
   examon:"How might students find courses, tests and updates in one place?",
   teamspace:"How might a team keep conversations, tasks and files together?",
+  "batch-manager":"How might the team manage a complete batch from setup to export in one workspace?",
+  "academic-planner":"How might academic teams create study plans and faculty schedules without repeated manual work?",
   "dpp-converter":"How might faculty turn raw questions into formatted practice sheets?",
   qampus:"How might students discover what matters around their campus?",
 };
@@ -128,7 +130,7 @@ export default function QueryProductStack({products}){
       <div className={styles.outputRoutes} aria-hidden="true"><i/><i/><i/><i/></div>
 
       <div className={`${styles.productBurst} ${phase==="preview"?styles.showBurst:""}`}>
-        {featured.map((product,index)=><div key={product.id} style={{"--burst-index":index}}><span>0{index+1}</span><strong>{product.title}</strong><small>REAL PRODUCT</small></div>)}
+        {featured.map((product,index)=><div key={product.id} style={{"--burst-index":index}}><span>{String(index+1).padStart(2,"0")}</span><strong>{product.title}</strong><small>REAL PRODUCT</small></div>)}
       </div>
 
       <div className={`${styles.projectWall} ${fullProducts?styles.showProjectWall:""} ${phase==="moving"?styles.moveProjectWall:""}`}>
@@ -158,11 +160,12 @@ export default function QueryProductStack({products}){
               </div>
             </div>
             <div className={styles.wallCopy}>
-              <div className={styles.productMeta}><span>0{index+1} / {product.category}</span><i>{product.role}</i></div>
+              <div className={styles.productMeta}><span>{String(index+1).padStart(2,"0")} / {product.category}</span><i>{product.role}</i></div>
               <h3>{product.title}</h3><p>{queryById[product.id]}</p>
               <div className={styles.cardActions}>
                 <Link href={`/projects/${product.id}`} onClick={event=>event.stopPropagation()}>READ CASE STUDY <span>↗</span></Link>
                 {product.live&&<a href={product.live} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>LIVE PRODUCT <span>↗</span></a>}
+                {!product.live&&product.github&&<a href={product.github} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>VIEW SOURCE <span>↗</span></a>}
               </div>
             </div>
           </article>;
@@ -173,7 +176,7 @@ export default function QueryProductStack({products}){
         <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
       </div>
 
-      <p className={styles.scrollHint}>{fullProducts?"USE READ CASE STUDY OR LIVE PRODUCT TO OPEN A PROJECT ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
+      <p className={styles.scrollHint}>{fullProducts?"USE READ CASE STUDY, LIVE PRODUCT OR SOURCE TO OPEN A PROJECT ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
     </div>
   </section>;
 }
