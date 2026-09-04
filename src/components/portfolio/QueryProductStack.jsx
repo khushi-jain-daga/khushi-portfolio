@@ -23,6 +23,30 @@ const queryById={
 };
 const clamp=(value,min=0,max=1)=>Math.max(min,Math.min(max,value));
 
+function circularOffset(index,active,length){
+  let difference=index-active;
+  const half=Math.floor(length/2);
+  if(difference < -half) difference += length;
+  if(difference > half) difference -= length;
+  return difference;
+}
+
+function cardPosition(offset){
+  const direction=offset<0?-1:1;
+  const depth=Math.abs(offset);
+
+  if(depth===0){
+    return {x:0,scale:1,opacity:1,z:30,filter:"none"};
+  }
+  if(depth===1){
+    return {x:direction*23,scale:.86,opacity:1,z:20,filter:"brightness(.67) saturate(.72)"};
+  }
+  if(depth===2){
+    return {x:direction*39,scale:.72,opacity:.92,z:10,filter:"brightness(.48) saturate(.58)"};
+  }
+  return {x:direction*55,scale:.58,opacity:0,z:1,filter:"brightness(.42) saturate(.5)"};
+}
+
 export default function QueryProductStack({products}){
   const ref=useRef(null);
   const [progress,setProgress]=useState(0);
@@ -58,8 +82,7 @@ export default function QueryProductStack({products}){
       if(!ref.current)return;
       const rect=ref.current.getBoundingClientRect();
       const travel=Math.max(1,ref.current.offsetHeight-window.innerHeight);
-      const next=clamp(-rect.top/travel);
-      setProgress(next);
+      setProgress(clamp(-rect.top/travel));
     };
     update();
     window.addEventListener("scroll",update,{passive:true});
@@ -89,18 +112,50 @@ export default function QueryProductStack({products}){
 
   const fullProducts=phase==="products"||phase==="moving";
   const isReady=phase==="clarity"||phase==="preview"||fullProducts;
-  const pauseAutoDeck=()=>{autoPauseUntil.current=Date.now()+4000;};
+
+  const pauseAutoDeck=(milliseconds=10000)=>{
+    autoPauseUntil.current=Date.now()+milliseconds;
+  };
+
+  const selectProject=(index)=>{
+    pauseAutoDeck();
+    setActiveProject(index);
+  };
+
+  const nextProject=()=>{
+    pauseAutoDeck();
+    setActiveProject(index=>(index+1)%featured.length);
+  };
+
+  const previousProject=()=>{
+    pauseAutoDeck();
+    setActiveProject(index=>(index-1+featured.length)%featured.length);
+  };
 
   useEffect(()=>{
     if(!fullProducts||featured.length<2)return;
     const timer=window.setInterval(()=>{
-      if(deckHovered.current||Date.now()<autoPauseUntil.current)return;
+      if(document.hidden||deckHovered.current||Date.now()<autoPauseUntil.current)return;
       setActiveProject(index=>(index+1)%featured.length);
-    },3500);
+    },4000);
     return()=>window.clearInterval(timer);
   },[fullProducts,featured.length]);
 
   return <section id="work" ref={ref} className={styles.section}>
+    <style>{`
+      .${styles.projectGrid} > .${styles.wallCard} {
+        animation: none !important;
+      }
+      .${styles.projectWall}.${styles.moveProjectWall} .${styles.projectGrid} > .${styles.wallCard}:hover,
+      .${styles.projectGrid} > .${styles.wallCard}.${styles.wallCardActive}:hover,
+      .${styles.projectGrid} > .${styles.wallCard}:not(.${styles.wallCardActive}):hover {
+        transform: var(--stable-card-transform) !important;
+      }
+      .${styles.projectGrid} > .${styles.wallCard}:not(.${styles.wallCardActive}) {
+        pointer-events: auto;
+      }
+    `}</style>
+
     <div className={`${styles.sticky} ${styles[`phase_${phase}`]}`}>
       <header className={styles.intro}>
         <span>PEOPLE DON’T ARRIVE WITH PRODUCT SPECS / 01</span>
@@ -137,48 +192,70 @@ export default function QueryProductStack({products}){
 
       <div className={`${styles.projectWall} ${fullProducts?styles.showProjectWall:""} ${phase==="moving"?styles.moveProjectWall:""}`}>
         <header><span>THE MESS BECOMES A PRODUCT / 02</span><h2>Problems become<em> working products.</em></h2></header>
-        <div className={styles.projectGrid} onPointerEnter={()=>{deckHovered.current=true;}} onPointerLeave={()=>{deckHovered.current=false;}}>
+
+        <div
+          className={styles.projectGrid}
+          onPointerEnter={()=>{deckHovered.current=true;}}
+          onPointerLeave={()=>{deckHovered.current=false;}}
+          onFocusCapture={()=>{deckHovered.current=true;}}
+          onBlurCapture={()=>{deckHovered.current=false;}}
+        >
           {featured.map((product,index)=>{
-          const gallery=product.id==="qampus"?[product.gallery?.[3],product.gallery?.[1],product.gallery?.[2]].filter(Boolean):(product.gallery||[]).slice(0,3);
-          let offset=index-activeProject;
-          const half=featured.length/2;
-          if(offset>half)offset-=featured.length;
-          if(offset<-half)offset+=featured.length;
-          const depth=Math.abs(offset);
-          const isActive=index===activeProject;
-          return <article
-            key={product.id}
-            className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`}
-            onClick={()=>{pauseAutoDeck();setActiveProject(index);}}
-            style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}}
-          >
-            <div className={styles.wallImage}>
-              <div className={`${styles.productCover} ${styles[`cover_${product.id.replaceAll("-","_")}`]}`}>
-                <span className={styles.coverLabel}>{product.category}</span>
-                {gallery.length?<div className={styles.deviceComposition}>
-                  {gallery.map((image,index)=><figure key={image} className={styles[`device${index+1}`]}><div className={styles.browserBar}><i/><i/><i/></div><div className={styles.screen}><Image src={image} alt={`${product.title} interface view ${index+1}`} fill sizes="(max-width: 820px) 72vw, 520px"/></div></figure>)}
-                </div>:<div className={styles.generatedCover}>{product.visualCode}</div>}
-                <strong>{product.title}</strong>
+            const gallery=product.id==="qampus"?[product.gallery?.[3],product.gallery?.[1],product.gallery?.[2]].filter(Boolean):(product.gallery||[]).slice(0,3);
+            const offset=circularOffset(index,activeProject,featured.length);
+            const position=cardPosition(offset);
+            const depth=Math.abs(offset);
+            const isActive=index===activeProject;
+            const stableTransform=`translateX(calc(-50% + ${position.x}vw)) scale(${position.scale})`;
+
+            return <article
+              key={product.id}
+              className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`}
+              onClick={()=>{if(!isActive)selectProject(index);else pauseAutoDeck();}}
+              onPointerDown={()=>pauseAutoDeck()}
+              style={{
+                "--wall-index":index,
+                "--stable-card-transform":stableTransform,
+                transform:stableTransform,
+                opacity:position.opacity,
+                zIndex:position.z,
+                filter:position.filter,
+                pointerEvents:depth<=2?"auto":"none",
+                transition:"transform 700ms cubic-bezier(.22,1,.36,1), opacity 340ms ease, filter 340ms ease, box-shadow 340ms ease",
+                willChange:"transform, opacity",
+              }}
+            >
+              <div className={styles.wallImage}>
+                <div className={`${styles.productCover} ${styles[`cover_${product.id.replaceAll("-","_")}`]}`}>
+                  <span className={styles.coverLabel}>{product.category}</span>
+                  {gallery.length?<div className={styles.deviceComposition}>
+                    {gallery.map((image,imageIndex)=><figure key={image} className={styles[`device${imageIndex+1}`]}><div className={styles.browserBar}><i/><i/><i/></div><div className={styles.screen}><Image src={image} alt={`${product.title} interface view ${imageIndex+1}`} fill sizes="(max-width: 820px) 72vw, 520px"/></div></figure>)}
+                  </div>:<div className={styles.generatedCover}>{product.visualCode}</div>}
+                  <strong>{product.title}</strong>
+                </div>
               </div>
-            </div>
-            <div className={styles.wallCopy}>
-              <div className={styles.productMeta}><span>{String(index+1).padStart(2,"0")} / {product.category}</span><i>{product.role}</i></div>
-              <h3>{product.title}</h3><p>{queryById[product.id]}</p>
-              <div className={styles.cardActions}>
-                <Link href={`/projects/${product.id}`} onClick={event=>event.stopPropagation()}>READ CASE STUDY <span>↗</span></Link>
-                {product.live&&<a href={product.live} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>LIVE PRODUCT <span>↗</span></a>}
-                {!product.live&&product.github&&<a href={product.github} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>VIEW SOURCE <span>↗</span></a>}
+
+              <div className={styles.wallCopy}>
+                <div className={styles.productMeta}><span>{String(index+1).padStart(2,"0")} / {product.category}</span><i>{product.role}</i></div>
+                <h3>{product.title}</h3><p>{queryById[product.id]}</p>
+                <div className={styles.cardActions}>
+                  <Link href={`/projects/${product.id}`} onPointerDown={event=>event.stopPropagation()} onClick={event=>event.stopPropagation()}>READ CASE STUDY <span>↗</span></Link>
+                  {product.live&&<a href={product.live} target="_blank" rel="noreferrer" onPointerDown={event=>event.stopPropagation()} onClick={event=>event.stopPropagation()}>LIVE PRODUCT <span>↗</span></a>}
+                  {!product.live&&product.github&&<a href={product.github} target="_blank" rel="noreferrer" onPointerDown={event=>event.stopPropagation()} onClick={event=>event.stopPropagation()}>VIEW SOURCE <span>↗</span></a>}
+                </div>
               </div>
-            </div>
-          </article>;
-        })}
-        <button type="button" className={`${styles.sidePicker} ${styles.sidePickerLeft}`} aria-label="Bring previous project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}/>
-        <button type="button" className={`${styles.sidePicker} ${styles.sidePickerRight}`} aria-label="Bring next project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}/>
+            </article>;
+          })}
         </div>
-        <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
+
+        <div className={styles.projectControls}>
+          <button type="button" aria-label="Previous project" onClick={previousProject}>←</button>
+          <div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>selectProject(index)}/>)}</div>
+          <button type="button" aria-label="Next project" onClick={nextProject}>→</button>
+        </div>
       </div>
 
-      <p className={styles.scrollHint}>{fullProducts?"USE READ CASE STUDY, LIVE PRODUCT OR SOURCE TO OPEN A PROJECT ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
+      <p className={styles.scrollHint}>{fullProducts?"CLICK A SIDE CARD OR USE THE ARROWS TO BROWSE ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
     </div>
   </section>;
 }
