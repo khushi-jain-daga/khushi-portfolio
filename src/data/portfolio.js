@@ -234,9 +234,12 @@ export const products = [
     problem: "Academic planning across batches, faculties and subjects was taking too much manual coordination.",
     built: "A browser-based planning system for study-plan generation, rolling batches, scheduling and polished PDF/calendar exports.",
     role: "PRODUCT · OPERATIONS · FULL STACK",
-    cover: null,
-    gallery: [],
+    cover: "/products/academic-planner-gallery.webp",
+    gallery: [
+      "/products/academic-planner-gallery.webp",
+    ],
     visualCode: "FACULTY + SUBJECTS → SCHEDULE → PDF / CALENDAR",
+    live: "https://examon-academic-planner.vercel.app/",
     github: "https://github.com/khushi-jain-daga/examon-academic-planner",
   },
   {
@@ -248,9 +251,12 @@ export const products = [
     problem: "Managing many EdTech batches across pricing, academics, DPPs, notes, creatives and platform data was fragmented and repetitive.",
     built: "A complete batch workspace with guided setup, pricing, content generation, academic material, creatives, exports and version history.",
     role: "PRODUCT · AUTOMATION · FULL STACK",
-    cover: null,
-    gallery: [],
+    cover: "/products/batch-manager-gallery.webp",
+    gallery: [
+      "/products/batch-manager-gallery.webp",
+    ],
     visualCode: "BATCH SETUP → CONTENT → ACADEMICS → CREATIVES → EXPORT",
+    live: "https://examon-batch-manager.vercel.app/",
   },
   {
     id: "shaktii",
@@ -261,8 +267,10 @@ export const products = [
     problem: "Security logs and threat signals are difficult to review quickly when analysis, reporting and investigation live in separate steps.",
     built: "A Vercel-ready cybersecurity product with log ingestion, sensitive-data redaction, IOC extraction, threat intelligence, AI enrichment and deterministic fallback analysis.",
     role: "AI · SECURITY · FULL STACK",
-    cover: null,
-    gallery: [],
+    cover: "/products/shaktii-gallery.webp",
+    gallery: [
+      "/products/shaktii-gallery.webp",
+    ],
     visualCode: "LOGS → REDACTION → ANALYSIS → IOCs → RESPONSE",
     live: "https://shaktii.vercel.app/",
     github: "https://github.com/khushi-jain-daga/shaktii",
