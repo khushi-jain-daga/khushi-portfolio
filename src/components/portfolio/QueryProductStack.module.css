@@ -138,6 +138,28 @@
   .cardActions{gap:7px}.cardActions a{padding:9px 10px;font-size:5.5px}.projectControls{bottom:1.4vh}
 }
 
+/* Stable carousel interaction: actual cards own hover/click; one compositor-only motion. */
+.projectGrid>.wallCard{
+  pointer-events:var(--card-pointer)!important;
+  transition:transform .78s cubic-bezier(.22,.8,.2,1),opacity .42s ease!important;
+  backface-visibility:hidden;
+  contain:layout paint;
+}
+.projectGrid>.wallCard:not(.wallCardActive){
+  filter:brightness(.62) saturate(.7);
+  transition:transform .78s cubic-bezier(.22,.8,.2,1),opacity .42s ease!important;
+}
+.projectGrid>.wallCardActive{
+  filter:none;
+}
+.projectGrid>.wallCard:focus-visible{
+  outline:2px solid #ff8db4;
+  outline-offset:5px;
+}
+.projectGrid>.wallCardActive:hover{
+  transform:var(--card-transform)!important;
+}
+
 @media(prefers-reduced-motion:reduce){.projectGrid>.wallCard{transition-duration:.01ms}.autoProgress{animation:none}.wallCardActive .screen img{transform:none}}
 
 /* V18: art-directed project covers instead of raw screenshot crops. */
