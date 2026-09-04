@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./QueryProductStack.module.css";
 
-const featuredIds=["examon","teamspace","batch-manager","academic-planner","dpp-converter","qampus"];
+const featuredIds=["examon","teamspace","batch-manager","academic-planner","shaktii","dpp-converter","qampus","banking-api"];
 const problems=[
   {from:"STUDENT · 09:14",quote:"I keep missing important courses, tests and updates.",need:"Everything in one reliable place."},
   {from:"TEAM · 11:42",quote:"Our conversations, tasks and files are scattered everywhere.",need:"One shared space that remembers."},
@@ -16,8 +16,10 @@ const queryById={
   teamspace:"How might a team keep conversations, tasks and files together?",
   "batch-manager":"How might the team manage a complete batch from setup to export in one workspace?",
   "academic-planner":"How might academic teams create study plans and faculty schedules without repeated manual work?",
+  shaktii:"How might security teams turn raw logs into useful findings, threat context and response steps?",
   "dpp-converter":"How might faculty turn raw questions into formatted practice sheets?",
   qampus:"How might students discover what matters around their campus?",
+  "banking-api":"How might a backend keep banking operations simple, validated and testable?",
 };
 const clamp=(value,min=0,max=1)=>Math.max(min,Math.min(max,value));
 
