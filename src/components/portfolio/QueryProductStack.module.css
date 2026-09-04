@@ -159,6 +159,16 @@
 .projectGrid>.wallCardActive:hover{
   transform:var(--card-transform)!important;
 }
+.projectWall.moveProjectWall .projectGrid>.wallCard,
+.projectWall.showProjectWall .projectGrid>.wallCard{
+  transform:var(--card-transform)!important;
+  opacity:var(--card-opacity)!important;
+  animation:none!important;
+}
+.projectWall.moveProjectWall .projectGrid>.wallCard:hover,
+.projectWall.showProjectWall .projectGrid>.wallCard:hover{
+  transform:var(--card-transform)!important;
+}
 
 @media(prefers-reduced-motion:reduce){.projectGrid>.wallCard{transition-duration:.01ms}.autoProgress{animation:none}.wallCardActive .screen img{transform:none}}
 
