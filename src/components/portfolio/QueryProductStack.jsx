@@ -142,7 +142,12 @@ export default function QueryProductStack({products}){
           if(offset<-half)offset+=featured.length;
           const depth=Math.abs(offset);
           const isActive=index===activeProject;
-          return <article key={product.id} className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`} style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}}>
+          return <article
+            key={product.id}
+            className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`}
+            onClick={()=>{pauseAutoDeck();setActiveProject(index);}}
+            style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}}
+          >
             <div className={styles.wallImage}>
               <div className={`${styles.productCover} ${styles[`cover_${product.id.replaceAll("-","_")}`]}`}>
                 <span className={styles.coverLabel}>{product.category}</span>
@@ -160,7 +165,6 @@ export default function QueryProductStack({products}){
                 {product.live&&<a href={product.live} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>LIVE PRODUCT <span>↗</span></a>}
               </div>
             </div>
-            {isActive&&<Link className={styles.cardOpenLink} href={`/projects/${product.id}`} aria-label={`Open ${product.title} case study`}/>} 
           </article>;
         })}
         <button type="button" className={`${styles.sidePicker} ${styles.sidePickerLeft}`} aria-label="Bring previous project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}/>
@@ -169,7 +173,7 @@ export default function QueryProductStack({products}){
         <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
       </div>
 
-      <p className={styles.scrollHint}>{fullProducts?"SELECT A PRODUCT TO READ THE FULL STORY ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
+      <p className={styles.scrollHint}>{fullProducts?"USE READ CASE STUDY OR LIVE PRODUCT TO OPEN A PROJECT ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
     </div>
   </section>;
 }
