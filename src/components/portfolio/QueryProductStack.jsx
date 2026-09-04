@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./QueryProductStack.module.css";
 
@@ -24,13 +25,16 @@ const queryById={
 const clamp=(value,min=0,max=1)=>Math.max(min,Math.min(max,value));
 
 export default function QueryProductStack({products}){
+  const router=useRouter();
   const ref=useRef(null);
   const [progress,setProgress]=useState(0);
   const [phase,setPhase]=useState("idle");
   const [activeProject,setActiveProject]=useState(0);
   const storyStarted=useRef(false);
-  const deckHovered=useRef(false);
-  const autoPauseUntil=useRef(0);
+  const [deckPaused,setDeckPaused]=useState(false);
+  const hoverLock=useRef(null);
+  const hoverUnlockTimer=useRef(null);
+  const resumeTimer=useRef(null);
   const restoringWork=useRef(false);
   const featured=useMemo(()=>featuredIds.map(id=>products.find(p=>p.id===id)).filter(Boolean),[products]);
 
@@ -89,16 +93,38 @@ export default function QueryProductStack({products}){
 
   const fullProducts=phase==="products"||phase==="moving";
   const isReady=phase==="clarity"||phase==="preview"||fullProducts;
-  const pauseAutoDeck=()=>{autoPauseUntil.current=Date.now()+4000;};
+  const pauseDeck=()=>{
+    if(resumeTimer.current)window.clearTimeout(resumeTimer.current);
+    setDeckPaused(true);
+  };
+  const resumeDeck=()=>{
+    hoverLock.current=null;
+    if(resumeTimer.current)window.clearTimeout(resumeTimer.current);
+    resumeTimer.current=window.setTimeout(()=>setDeckPaused(false),1200);
+  };
+  const focusCard=(index,id)=>{
+    pauseDeck();
+    if(hoverLock.current===null){
+      hoverLock.current=id;
+      setActiveProject(index);
+      hoverUnlockTimer.current=window.setTimeout(()=>{
+        hoverLock.current=null;
+      },850);
+    }
+  };
+
+  useEffect(()=>()=>{
+    if(resumeTimer.current)window.clearTimeout(resumeTimer.current);
+    if(hoverUnlockTimer.current)window.clearTimeout(hoverUnlockTimer.current);
+  },[]);
 
   useEffect(()=>{
-    if(!fullProducts||featured.length<2)return;
-    const timer=window.setInterval(()=>{
-      if(deckHovered.current||Date.now()<autoPauseUntil.current)return;
+    if(!fullProducts||featured.length<2||deckPaused)return;
+    const timer=window.setTimeout(()=>{
       setActiveProject(index=>(index+1)%featured.length);
-    },3500);
-    return()=>window.clearInterval(timer);
-  },[fullProducts,featured.length]);
+    },4200);
+    return()=>window.clearTimeout(timer);
+  },[fullProducts,featured.length,activeProject,deckPaused]);
 
   return <section id="work" ref={ref} className={styles.section}>
     <div className={`${styles.sticky} ${styles[`phase_${phase}`]}`}>
@@ -137,20 +163,32 @@ export default function QueryProductStack({products}){
 
       <div className={`${styles.projectWall} ${fullProducts?styles.showProjectWall:""} ${phase==="moving"?styles.moveProjectWall:""}`}>
         <header><span>THE MESS BECOMES A PRODUCT / 02</span><h2>Problems become<em> working products.</em></h2></header>
-        <div className={styles.projectGrid} onPointerEnter={()=>{deckHovered.current=true;}} onPointerLeave={()=>{deckHovered.current=false;}}>
+        <div className={styles.projectGrid} onPointerEnter={pauseDeck} onPointerLeave={resumeDeck}>
           {featured.map((product,index)=>{
           const gallery=product.id==="qampus"?[product.gallery?.[3],product.gallery?.[1],product.gallery?.[2]].filter(Boolean):(product.gallery||[]).slice(0,3);
-          let offset=index-activeProject;
-          const half=featured.length/2;
-          if(offset>half)offset-=featured.length;
-          if(offset<-half)offset+=featured.length;
+          const forward=(index-activeProject+featured.length)%featured.length;
+          const offset=forward>featured.length/2?forward-featured.length:forward;
           const depth=Math.abs(offset);
           const isActive=index===activeProject;
           return <article
             key={product.id}
             className={`${styles.wallCard} ${isActive?styles.wallCardActive:""}`}
-            onClick={()=>{pauseAutoDeck();setActiveProject(index);}}
-            style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-transform":`translateX(calc(-50% + ${offset*25}vw)) translateZ(${-depth*210}px) rotateY(${offset===0?0:offset>0?-12:12}deg) scale(${1-depth*.08})`}}
+            tabIndex={depth<=2?0:-1}
+            aria-label={`${product.title}${isActive?", open case study":", bring to centre"}`}
+            onPointerEnter={()=>focusCard(index,product.id)}
+            onClick={()=>{
+              pauseDeck();
+              if(isActive||hoverLock.current===product.id)router.push(`/projects/${product.id}`);
+              else setActiveProject(index);
+            }}
+            onKeyDown={event=>{
+              if(event.key!=="Enter"&&event.key!==" ")return;
+              event.preventDefault();
+              pauseDeck();
+              if(isActive)router.push(`/projects/${product.id}`);
+              else setActiveProject(index);
+            }}
+            style={{"--wall-index":index,"--card-z":featured.length-depth,"--card-opacity":depth>2?0:1,"--card-pointer":depth>2?"none":"auto","--card-transform":`translate3d(calc(-50% + ${offset*24}vw), 0, ${-depth*190}px) rotateY(${offset===0?0:offset>0?-10:10}deg) scale(${1-depth*.075})`}}
           >
             <div className={styles.wallImage}>
               <div className={`${styles.productCover} ${styles[`cover_${product.id.replaceAll("-","_")}`]}`}>
@@ -172,10 +210,8 @@ export default function QueryProductStack({products}){
             </div>
           </article>;
         })}
-        <button type="button" className={`${styles.sidePicker} ${styles.sidePickerLeft}`} aria-label="Bring previous project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}/>
-        <button type="button" className={`${styles.sidePicker} ${styles.sidePickerRight}`} aria-label="Bring next project to centre" onPointerEnter={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}} onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}/>
         </div>
-        <div className={styles.projectControls}><button type="button" aria-label="Previous project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseAutoDeck();setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseAutoDeck();setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
+        <div className={styles.projectControls} onPointerEnter={pauseDeck} onPointerLeave={resumeDeck}><button type="button" aria-label="Previous project" onClick={()=>{pauseDeck();hoverLock.current="controls";setActiveProject(index=>(index-1+featured.length)%featured.length);}}>←</button><div>{featured.map((product,index)=><button type="button" key={product.id} aria-label={`Show ${product.title}`} className={index===activeProject?styles.activeDot:""} onClick={()=>{pauseDeck();hoverLock.current="controls";setActiveProject(index);}}/>)}</div><button type="button" aria-label="Next project" onClick={()=>{pauseDeck();hoverLock.current="controls";setActiveProject(index=>(index+1)%featured.length);}}>→</button></div>
       </div>
 
       <p className={styles.scrollHint}>{fullProducts?"USE READ CASE STUDY, LIVE PRODUCT OR SOURCE TO OPEN A PROJECT ↗":"KEEP SCROLLING — WATCH THE TRANSFORMATION ↓"}</p>
