@@ -11,6 +11,8 @@ const details = {
   "rank-predictor": { stack:["Data logic","Frontend","Product UX","Visualisation"], impact:["Score context","Clear estimates","Student decision support"], decisions:["Explain the estimate","Reduce input friction","Show useful context, not only a rank"] },
   "academic-planner": { stack:["Browser app","Scheduling logic","localStorage","CSV export","PDF / print workflows"], impact:["Study-plan generation","Faculty workload planning","Rolling batch support"], decisions:["Model faculty-subject relationships first","Keep weekend changes explicit","Make plans exportable for operations"] },
   "batch-manager": { stack:["Node.js","Server-backed web app","JSON data store","Document parsing","AI adapters"], impact:["One workspace per batch","40+ batch operations","Batch-to-publish workflow"], decisions:["Keep the batch as the main data unit","Make AI optional with useful fallbacks","Keep every output versioned and exportable"] },
+  shaktii: { stack:["React 19","TypeScript","Vite","Vercel Functions","Threat-intel APIs"], impact:["AI-assisted security analysis","Sensitive-data redaction","Threat investigation workflow"], decisions:["Redact before analysis","Keep deterministic fallback logic","Separate analysis, investigation and response steps"] },
+  "banking-api": { stack:["Python","FastAPI","Pydantic","Pytest","Swagger"], impact:["Validated account workflows","Transfer and transaction rules","Automated API tests"], decisions:["Keep business rules out of routes","Use clear domain errors","Test important failure cases as well as happy paths"] },
 };
 
 export default function ProjectStoryPage({ product, nextProduct }) {
