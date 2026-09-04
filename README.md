@@ -1,11 +1,14 @@
 # Khushi Jain Daga — Product & Full-Stack Portfolio
 
+🌐 **Live Portfolio:** https://khushi-jain-daga-portfolio.vercel.app/
+
 I build products around real problems — from production education platforms and internal team tools to workflow automation and AI-assisted applications.
 
 This repository contains my personal portfolio. The portfolio is designed as a visual introduction to my work, while the links below give a faster technical view of the projects I discuss in interviews and Loom walkthroughs.
 
 ## Quick Links
 
+- **Live Portfolio:** https://khushi-jain-daga-portfolio.vercel.app/
 - **GitHub:** https://github.com/khushi-jain-daga
 - **Examon Education:** https://www.examoneducation.com/
 - **TeamSpace:** https://teamspace-v7.vercel.app/
